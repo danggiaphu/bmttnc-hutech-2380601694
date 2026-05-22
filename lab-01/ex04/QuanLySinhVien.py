@@ -2,96 +2,97 @@ from SinhVien import SinhVien
 
 class QuanLySinhVien:
     listSinhVien = []
-    
- #tao id sv   
+
     def generateID(self):
         maxId = 1
-        if(self.so_luong_sv() > 0):
+        if (self.soLuongSinhVien() > 0):
             maxId = self.listSinhVien[0]._id
             for sv in self.listSinhVien:
-                if(sv._id > maxId):
+                if (maxId < sv._id):
                     maxId = sv._id
-            maxId += 1
+            maxId = maxId + 1
         return maxId
-    
-    def so_luong_sv(self):
+
+    def soLuongSinhVien(self):
         return self.listSinhVien.__len__()
-    
-#nhap thong tin sv 
-    def nhap_sv(self):
+
+    def nhapSinhVien(self):
         svId = self.generateID()
-        name = input("Nhập tên sinh viên:")
-        sex= input("Nhập giới tính:")
-        major = input("Nhập chuyên ngành:")
-        diemTB = float(input("Nhập điểm trung bình:"))
+        name = input("Nhap ten sinh vien: ")
+        sex = input("Nhap gioi tinh sinh vien: ")
+        major = input("Nhap chuyen nganh cua sinh vien: ")
+        diemTB = float(input("Nhap diem cua sinh vien: "))
         sv = SinhVien(svId, name, sex, major, diemTB)
-        self.xep_hoc_luc(sv)
+        self.xepLoaiHocLuc(sv)
         self.listSinhVien.append(sv)
-#cn tt sv
-    def updatesv(self, ID):
+
+    def updateSinhVien(self, ID):
         sv:SinhVien = self.findByID(ID)
-        if(sv != None):
-            name = input("Nhập tên sinh viên:")
-            sex= input("Nhập giới tính:")
-            major = input("Nhập chuyên ngành:")
-            diemTB = float(input("Nhập điểm trung bình:"))
+        if (sv != None):
+            name = input("Nhap ten sinh vien: ")
+            sex = input("Nhap gioi tinh sinh vien: ")
+            major = input("Nhap chuyen nganh cua sinh vien: ")
+            diemTB = float(input("Nhap diem cua sinh vien: "))
+            
             sv._name = name
             sv._sex = sex
             sv._major = major
             sv._diemTB = diemTB
-            self.xep_hoc_luc(sv)
+            self.xepLoaiHocLuc(sv)
         else:
-            print("sinh vien co ID: {} khong ton tai".format(ID))
-# sort theo id, ten, diemTB        
-    def sortbyID (self):
-        self.listSinhVien.sort(key=lambda x: x._id, reverse = False)
-    def sortbyName(self):
-        self.listSinhVien.sort(key=lambda x: x._name, reverse = False)
-    def sortbyDiemTB(self):
-        self.listSinhVien.sort(key=lambda x: x._diemTB, reverse = False)
-#tim ID sv       
+            print("Sinh vien co ID = {} khong ton tai.".format(ID))
+
+    def sortByID(self):
+        self.listSinhVien.sort(key=lambda x: x._id, reverse=False)
+
+    def sortByName(self):
+        self.listSinhVien.sort(key=lambda x: x._name, reverse=False)
+
+    def sortByDiemTB(self):
+        self.listSinhVien.sort(key=lambda x: x._diemTB, reverse=False)
+
     def findByID(self, ID):
         searchResult = None
-        if(self.so_luong_sv() > 0):
+        if (self.soLuongSinhVien() > 0):
             for sv in self.listSinhVien:
-                if(sv._id == ID):
+                if (sv._id == ID):
                     searchResult = sv
-                    break
         return searchResult
-#tim theo ten
+
     def findByName(self, keyword):
-        listSearchResult = []
-        if(self.so_luong_sv() > 0):
+        listSV = []
+        if (self.soLuongSinhVien() > 0):
             for sv in self.listSinhVien:
-                if(keyword.upper() in sv._name.upper()):
-                    listSearchResult.append(sv)
-        return listSearchResult   
-#xoa theo id 
-    def deletebyID(self, ID):
+                if (keyword.upper() in sv._name.upper()):
+                    listSV.append(sv)
+        return listSV
+
+    def deleteById(self, ID):
         isDeleted = False
         sv = self.findByID(ID)
-        if sv is not None:
+        if (sv != None):
             self.listSinhVien.remove(sv)
-        isDeleted = True
+            isDeleted = True
         return isDeleted
 
-#xep hoc luc
-    def xep_hoc_luc(self, sv:SinhVien):
-        if(sv._diemTB >= 8):
-            sv._hocluc = "Gioi"
-        elif(sv._diemTB >= 6.5):
-            sv._hocluc = "Kha"
-        elif(sv._diemTB >= 5):
-            sv._hocluc = "Trung binh"
+    def xepLoaiHocLuc(self, sv:SinhVien):
+        if (sv._diemTB >= 8):
+            sv._hocLuc = "Gioi"
+        elif (sv._diemTB >= 6.5):
+            sv._hocLuc = "Kha"
+        elif (sv._diemTB >= 5):
+            sv._hocLuc = "Trung binh"
         else:
-            sv._hocluc = "Yeu"
-#hien thi thong tin sv
-    def show_sv(self, listSV):
-        print("{:<8} {:<15} {:<10} {:<15} {:<10} {:<10}".format("ID", "Name", "Sex", "Major", "GPA", "Hoc Luc"))
-        if len(listSV) > 0:
+            sv._hocLuc = "Yeu"
+
+    def showSinhVien(self, listSV):
+        print("{:<8} {:<18} {:<8} {:<8}{:<8} {:<8}"
+              .format("ID", "Name", "Sex", "Major", "Diem TB", "Hoc Luc"))
+        if (listSV.__len__() > 0):
             for sv in listSV:
-                print("{:<8} {:<15} {:<10} {:<15} {:<10} {:<10}".format(sv._id, sv._name, sv._sex, sv._major, sv._diemTB, sv._hocluc))
+                print("{:<8} {:<18} {:<8} {:<8}{:<8} {:<8} "
+                      .format(sv._id, sv._name, sv._sex, sv._major, sv._diemTB, sv._hocLuc))
         print("\n")
-    
-    def getListSV(self):
+
+    def getListSinhVien(self):
         return self.listSinhVien
