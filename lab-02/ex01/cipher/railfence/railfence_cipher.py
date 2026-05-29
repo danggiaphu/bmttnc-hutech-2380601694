@@ -1,29 +1,32 @@
 class RailFenceCipher:
     def __init__(self):
         pass
-    def rail_fence_encrypt (self, plain_text, num_rails):
+
+    def rail_fence_encrypt(self, plain_text, num_rails):
         rails = [[] for _ in range(num_rails)]
         rail_index = 0
-        direction = 1 #1: xuong, -1: len
+        direction = 1  # 1: xuống, -1: lên
         for char in plain_text:
             rails[rail_index].append(char)
-            if rail_index ==0:
-                direction =1
+            if rail_index == 0:
+                direction = 1
             elif rail_index == num_rails - 1:
                 direction = -1
             rail_index += direction
         cipher_text = ''.join(''.join(rail) for rail in rails)
         return cipher_text
+
     def rail_fence_decrypt(self, cipher_text, num_rails):
-        rail_lenghts = [0] * num_rails
+        # Đã sửa lỗi typo: biến thống nhất là rail_lengths
+        rail_lengths = [0] * num_rails  
         rail_index = 0
         direction = 1
         
-        for _ in range (len(cipher_text)):
+        for _ in range(len(cipher_text)):
             rail_lengths[rail_index] += 1
-            if rail_index ==0:
+            if rail_index == 0:
                 direction = 1
-            elif rail_index == num_rails -1:
+            elif rail_index == num_rails - 1:
                 direction = -1
             rail_index += direction
             
@@ -36,12 +39,13 @@ class RailFenceCipher:
         rail_index = 0
         direction = 1
         
-        for _ in range (len(cipher_text)):
-            plain_text += rails[rail_index][0]
-            rails[rail_index] = rails[rail_index][1:]
+        for _ in range(len(cipher_text)):
+            if rails[rail_index]:  # Kiểm tra tránh lỗi index rỗng ngoài ý muốn
+                plain_text += rails[rail_index][0]
+                rails[rail_index] = rails[rail_index][1:]
             if rail_index == 0:
                 direction = 1
-            elif rail_index == num_rails -1 :
+            elif rail_index == num_rails - 1:
                 direction = -1
             rail_index += direction
         return plain_text
