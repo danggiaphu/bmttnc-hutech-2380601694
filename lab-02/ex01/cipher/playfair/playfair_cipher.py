@@ -3,18 +3,18 @@ class PlayfairCipher:
         pass # Name
 
     def create_playfair_matrix(self, key):
-        key = key.replace("J", "I") # Chuyển "J" thành "I" trong khóa
+        key = key.replace("J", "I")
         key = key.upper()
         key_set = set(key)
         alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         remaining_letters = [
             letter for letter in alphabet if letter not in key_set
         ]
-        matrix = list(key) # Bắt đầu ma trận với các ký tự từ khóa
+        matrix = list(key) 
 
         for letter in remaining_letters:
             matrix.append(letter)
-            if len(matrix) == 25: # Đảm bảo ma trận 5x5
+            if len(matrix) == 25: 
                 break
         
         playfair_matrix = [matrix[i:i+5] for i in range(0, len(matrix), 5)]
