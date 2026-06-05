@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Caesar Cipher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        .cipher-section {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-weight: bold;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border: 1px dashed #6c757d;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 100px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="text-center mb-4">
+            <h1 class="display-4 font-weight-bold text-dark">CAESAR CIPHER</h1>
+            <p class="text-muted">Mã hóa và giải mã văn bản sử dụng thuật toán dịch chuyển Caesar</p>
+        </div>
+
+        <div class="cipher-section">
+            <h3 class="section-title">ENCRYPTION (MÃ HÓA)</h3>
+            <form method="POST" action="/caesar/encrypt" class="cipher-form">
+                <div class="row align-items-stretch">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label class="font-weight-bold">Plain text:</label>
+                            <input type="text" class="form-control" name="inputPlainText" placeholder="Nhập văn bản cần mã hóa..." required autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Key (Phải từ 1 đến 25):</label>
+                            <input type="number" class="form-control" name="inputKeyPlain" min="1" max="25" placeholder="Nhập số từ 1-25" required>
+                            <div class="invalid-feedback">⚠️ Lỗi: Key không hợp lệ! Vui lòng nhập một số nguyên từ 1 đến 25.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4 font-weight-bold">Encrypt</button>
+                    </div>
+                    
+                    <div class="col-md-5 mt-3 mt-md-0 d-flex flex-column">
+                        <label class="font-weight-bold text-success">Kết quả mã hóa:</label>
+                        <div class="result-box flex-grow-1 d-flex align-items-center justify-content-center text-center">
+                            <span class="text-muted italic-text">Kết quả sẽ hiển thị tại đây...</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="cipher-section">
+            <h3 class="section-title">DECRYPTION (GIẢI MÃ)</h3>
+            <form method="POST" action="/caesar/decrypt" class="cipher-form">
+                <div class="row align-items-stretch">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label class="font-weight-bold">Cipher text:</label>
+                            <input type="text" class="form-control" name="inputCipherText" placeholder="Nhập chuỗi mã hóa cần giải..." required>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Key (Phải từ 1 đến 25):</label>
+                            <input type="number" class="form-control" name="inputKeyCipher" min="1" max="25" placeholder="Nhập số từ 1-25" required>
+                            <div class="invalid-feedback">⚠️ Lỗi: Key không hợp lệ! Vui lòng nhập một số nguyên từ 1 đến 25.</div>
+                        </div>
+                        <button type="submit" class="btn btn-success px-4 font-weight-bold">Decrypt</button>
+                    </div>
+                    
+                    <div class="col-md-5 mt-3 mt-md-0 d-flex flex-column">
+                        <label class="font-weight-bold text-danger">Kết quả giải mã:</label>
+                        <div class="result-box flex-grow-1 d-flex align-items-center justify-content-center text-center">
+                            <span class="text-muted italic-text">Kết quả sẽ hiển thị tại đây...</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.cipher-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                // Chặn hành vi submit mặc định của form để trang không bị load lại
+                event.preventDefault(); 
+
+                const keyInput = this.querySelector('input[type="number"]');
+                const keyValue = parseInt(keyInput.value, 10);
+                const resultContainer = this.querySelector('.result-box');
+
+                // 1. Kiểm tra lại ràng buộc Key bằng JavaScript
+                if (isNaN(keyValue) || keyValue < 1 || keyValue > 25) {
+                    keyInput.classList.add('is-invalid');
+                    keyInput.focus();
+                    return;
+                } else {
+                    keyInput.classList.remove('is-invalid');
+                }
+
+                // Hiển thị trạng thái đang xử lý ngắn hạn
+                resultContainer.innerHTML = '<div class="spinner-border text-secondary" role="status"></div>';
+
+                // 2. Sử dụng Fetch API để gửi dữ liệu ngầm đến Flask
+                const formData = new FormData(this);
+                const actionUrl = this.getAttribute('action');
+
+                fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Lỗi kết nối máy chủ.");
+                    }
+                    return response.text(); // Đọc kết quả dạng text hoặc html từ Flask trả về
+                })
+                .then(data => {
+                    // Đưa kết quả lấy được từ hàm Python hiển thị vào hộp kết quả kế bên
+                    resultContainer.className = "result-box flex-grow-1 p-3 text-left bg-white font-weight-bold text-dark";
+                    resultContainer.innerHTML = `<div style="font-family: monospace; font-size: 15px;">${data}</div>`;
+                })
+                .catch(error => {
+                    resultContainer.className = "result-box flex-grow-1 d-flex align-items-center justify-content-center text-center";
+                    resultContainer.innerHTML = `<span class="text-danger">❌ Có lỗi xảy ra: ${error.message}</span>`;
+                });
+            });
+
+            // Tự động tắt viền đỏ thông báo khi gõ lại key
+            form.querySelector('input[type="number"]').addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+        });
+    </script>
+</body>
+</html>
