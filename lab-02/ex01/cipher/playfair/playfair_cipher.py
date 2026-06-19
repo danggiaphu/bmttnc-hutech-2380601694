@@ -1,14 +1,40 @@
 class PlayfairCipher:
     def __init__(self):
-        # Định nghĩa trực tiếp ma trận chữ cái tại đây để CẮT ĐỨT HOÀN TOÀN circular import
         self.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("J", "I")
 
+    def _validate_key(self, key: any) -> str:
+        """
+        Hàm kiểm tra ràng buộc chặt chẽ cho Khóa (Key) của Playfair.
+        Bắn lỗi nếu key trống hoặc không chứa chữ cái hợp lệ.
+        """
+        if key is None:
+            raise ValueError("Lỗi: Khóa (Key) không được để trống! Vui lòng nhập lại.")
+            
+        # Chuyển về chuỗi ký tự chữ, viết hoa và loại bỏ khoảng trắng thừa
+        key_str = str(key).upper().strip().replace("J", "I")
+        
+        if key_str == "":
+            raise ValueError("Lỗi: Khóa (Key) không được để trống! Vui lòng nhập lại.")
+            
+        # Lọc lấy danh sách các ký tự chữ cái hợp lệ nằm trong bảng chữ cái (A-Z)
+        valid_chars = [letter for letter in key_str if letter in self.alphabet]
+        
+        # Nếu sau khi lọc mà chuỗi bị rỗng (ví dụ người dùng nhập toàn số "123" hoặc ký tự đặc biệt "@#$")
+        if not valid_chars:
+            raise ValueError(
+                "Lỗi: Khóa (Key) của Playfair bắt buộc phải chứa các ký tự chữ cái [A-Z]!\n"
+                " Vui lòng nhập lại (Ví dụ: HUTECH, BAOMAT,...)."
+            )
+            
+        return "".join(valid_chars)
+
     def create_playfair_matrix(self, key: str):
-        # Tiền xử lý Key: Viết hoa, thay J bằng I, lọc chỉ giữ lại chữ cái chuẩn
-        key = key.upper().replace("J", "I")
+        # ĐỒNG BỘ RÀNG BUỘC: Gọi hàm validate trước khi xử lý tạo ma trận
+        clean_key_str = self._validate_key(key)
+        
         clean_key = []
-        for letter in key:
-            if letter in self.alphabet and letter not in clean_key:
+        for letter in clean_key_str:
+            if letter not in clean_key:
                 clean_key.append(letter)
 
         # Điền các ký tự còn lại trong alphabet vào ma trận

@@ -2,62 +2,238 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Railfence Cipher</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <style>
+        /* Thiết lập cơ bản cho toàn bộ trang */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Tiêu đề trang */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            color: #212529;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        /* Khung bao bọc khu vực Mã hóa / Giải mã */
         .cipher-section {
             background-color: #ffffff;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
         .section-title {
+            font-size: 1.4rem;
             font-weight: bold;
             color: #007bff;
             border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
-            margin-bottom: 20px;
+            padding-bottom: 8px;
+            margin-top: 0;
+            margin-bottom: 25px;
         }
+
+        /* Cấu trúc lưới chia làm 2 cột (Trái: Form nhập liệu, Phải: Hộp kết quả) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1.3fr 1fr;
+            }
+        }
+
+        /* Phần tử trong form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        /* Ô nhập dữ liệu (Inputs) */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #80bdff;
+            outline: 0;
+        }
+
+        /* Trạng thái lỗi tùy biến cho ô nhập */
+        .form-control.has-error {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+
+        /* Văn bản thông báo lỗi */
+        .invalid-feedback-custom {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Nút bấm (Buttons) */
+        .btn {
+            display: inline-block;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        /* Cột hiển thị kết quả */
+        .result-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-wrapper label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .text-success { color: #28a745; }
+        .text-danger { color: #dc3545; }
+
+        /* Hộp chứa kết quả tĩnh ban đầu */
         .result-box {
             background-color: #f8f9fa;
             border: 1px dashed #6c757d;
             border-radius: 6px;
-            padding: 15px;
-            min-height: 100px;
-            height: 100%;
+            padding: 20px;
+            min-height: 120px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        /* Khi nhận được kết quả thành công từ Server */
+        .result-box.success {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            text-align: left;
+            align-items: flex-start;
+            justify-content: flex-start;
+            font-family: monospace;
+            font-size: 15px;
+            color: #212529;
+            font-weight: bold;
+        }
+
+        .text-muted { color: #6c757d; font-style: italic; }
+
+        /* Vòng xoay tải dữ liệu thuần bằng CSS */
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6c757d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="text-center mb-4">
-            <h1 class="display-4 font-weight-bold text-dark">RAILFENCE CIPHER</h1>
-            <p class="text-muted">Mã hóa và giải mã văn bản sử dụng mật mã hàng rào ziczac (Rail Fence)</p>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Railfence Cipher</h1>
+            <p>Mã hóa và giải mã văn bản sử dụng mật mã hàng rào ziczac (Rail Fence)</p>
         </div>
 
         <div class="cipher-section">
             <h3 class="section-title">ENCRYPTION (MÃ HÓA)</h3>
             <form method="POST" action="/railfence/encrypt" class="railfence-form">
-                <div class="row align-items-stretch">
-                    <div class="col-md-7">
+                <div class="grid-container">
+                    <div>
                         <div class="form-group">
-                            <label class="font-weight-bold">Plain text:</label>
+                            <label>Plain text:</label>
                             <input type="text" class="form-control text-input" name="inputPlainText" placeholder="Input Plain Text" required autofocus>
                         </div>
                         <div class="form-group">
-                            <label class="font-weight-bold">Key (Số hàng phải &gt;= 2):</label>
+                            <label>Key (Số hàng phải &gt;= 2):</label>
                             <input type="number" class="form-control key-input" name="inputKeyPlain" min="2" placeholder="Input Key (>= 2)" required>
-                            <div class="invalid-feedback" style="display: none; color: red; margin-top: 5px;"></div>
+                            <div class="invalid-feedback-custom" style="display: none;"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary px-4 font-weight-bold">Encrypt</button>
+                        <button type="submit" class="btn btn-primary">Encrypt</button>
                     </div>
                     
-                    <div class="col-md-5 mt-3 mt-md-0 d-flex flex-column">
-                        <label class="font-weight-bold text-success">Kết quả mã hóa:</label>
-                        <div class="result-box flex-grow-1 d-flex align-items-center justify-content-center text-center">
-                            <span class="text-muted italic-text">Kết quả sẽ hiển thị tại đây...</span>
+                    <div class="result-wrapper">
+                        <label class="text-success">Kết quả mã hóa:</label>
+                        <div class="result-box">
+                            <span class="text-muted">Kết quả sẽ hiển thị tại đây...</span>
                         </div>
                     </div>
                 </div>
@@ -67,24 +243,24 @@
         <div class="cipher-section">
             <h3 class="section-title">DECRYPTION (GIẢI MÃ)</h3>
             <form method="POST" action="/railfence/decrypt" class="railfence-form">
-                <div class="row align-items-stretch">
-                    <div class="col-md-7">
+                <div class="grid-container">
+                    <div>
                         <div class="form-group">
-                            <label class="font-weight-bold">Cipher text:</label>
+                            <label>Cipher text:</label>
                             <input type="text" class="form-control text-input" name="inputCipherText" placeholder="Input Cipher Text" required>
                         </div>
                         <div class="form-group">
-                            <label class="font-weight-bold">Key (Số hàng phải &gt;= 2):</label>
+                            <label>Key (Số hàng phải &gt;= 2):</label>
                             <input type="number" class="form-control key-input" name="inputKeyCipher" min="2" placeholder="Input Key (>= 2)" required>
-                            <div class="invalid-feedback" style="display: none; color: red; margin-top: 5px;"></div>
+                            <div class="invalid-feedback-custom" style="display: none;"></div>
                         </div>
-                        <button type="submit" class="btn btn-success px-4 font-weight-bold">Decrypt</button>
+                        <button type="submit" class="btn btn-success">Decrypt</button>
                     </div>
                     
-                    <div class="col-md-5 mt-3 mt-md-0 d-flex flex-column">
-                        <label class="font-weight-bold text-danger">Kết quả giải mã:</label>
-                        <div class="result-box flex-grow-1 d-flex align-items-center justify-content-center text-center">
-                            <span class="text-muted italic-text">Kết quả sẽ hiển thị tại đây...</span>
+                    <div class="result-wrapper">
+                        <label class="text-danger">Kết quả giải mã:</label>
+                        <div class="result-box">
+                            <span class="text-muted">Kết quả sẽ hiển thị tại đây...</span>
                         </div>
                     </div>
                 </div>
@@ -99,24 +275,27 @@
                 event.preventDefault(); 
 
                 const keyInput = this.querySelector('.key-input');
-                const feedback = this.querySelector('.invalid-feedback');
+                const feedback = this.parentNode.querySelector('.invalid-feedback-custom');
                 const keyValue = parseInt(keyInput.value, 10);
                 const resultContainer = this.querySelector('.result-box');
 
                 // 1. Kiểm tra điều kiện ràng buộc (Key phải >= 2)
                 if (isNaN(keyValue) || keyValue < 2) {
-                    feedback.textContent = "⚠️ Lỗi: Key không hợp lệ! Thuật toán Rail Fence yêu cầu số hàng (Key) phải lớn hơn hoặc bằng 2.";
-                    feedback.style.display = 'block';
-                    keyInput.classList.add('is-invalid');
+                    if (feedback) {
+                        feedback.textContent = "⚠️ Lỗi: Key không hợp lệ! Thuật toán Rail Fence yêu cầu số hàng (Key) phải lớn hơn hoặc bằng 2.";
+                        feedback.style.display = 'block';
+                    }
+                    keyInput.classList.add('has-error');
                     keyInput.focus();
                     return;
                 } else {
-                    feedback.style.display = 'none';
-                    keyInput.classList.remove('is-invalid');
+                    if (feedback) feedback.style.display = 'none';
+                    keyInput.classList.remove('has-error');
                 }
 
-                // Hiển thị trạng thái đang xử lý (loading)
-                resultContainer.innerHTML = '<div class="spinner-border text-secondary" role="status"></div>';
+                // Hiển thị trạng thái đang xử lý (Sử dụng CSS Spinner thuần)
+                resultContainer.className = "result-box";
+                resultContainer.innerHTML = '<div class="spinner"></div>';
 
                 // 2. Sử dụng Fetch API gửi ngầm dữ liệu lên Flask
                 const formData = new FormData(this);
@@ -133,20 +312,20 @@
                     return response.text();
                 })
                 .then(data => {
-                    // Đổ kết quả chuỗi Python trả về vào hộp bên cạnh
-                    resultContainer.className = "result-box flex-grow-1 p-3 text-left bg-white font-weight-bold text-dark";
-                    resultContainer.innerHTML = `<div style="font-family: monospace; font-size: 15px;">${data}</div>`;
+                    // Đổ dữ liệu text từ hàm Python vào hộp kết quả và áp dụng class success
+                    resultContainer.className = "result-box success";
+                    resultContainer.innerHTML = `<div>${data}</div>`;
                 })
                 .catch(error => {
-                    resultContainer.className = "result-box flex-grow-1 d-flex align-items-center justify-content-center text-center";
+                    resultContainer.className = "result-box";
                     resultContainer.innerHTML = `<span class="text-danger">❌ Có lỗi xảy ra: ${error.message}</span>`;
                 });
             });
 
             // Tự động xóa trạng thái đỏ khi người dùng nhập lại key
             form.querySelector('.key-input').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                this.classList.remove('has-error');
+                const feedback = this.parentNode.querySelector('.invalid-feedback-custom');
                 if (feedback) feedback.style.display = 'none';
             });
         });
